@@ -12,7 +12,7 @@ class Location_Tracker:
         self.window.configure(bg="#3f5efb")
         self.window.resizable(False, False)
 
-        #___________Application menu_____________
+        #___________Application menus_____________
         Label(App, text="Enter a phone number",fg="white", font=("Times", 20), bg="#3f5efb").place(x=150,y= 30)
         self.phone_number = Entry(App, width=16, font=("Arial", 15), relief="flat")
         self.track_button = Button(App, text="Track Country", bg="#22c1c3", relief="sunken")
