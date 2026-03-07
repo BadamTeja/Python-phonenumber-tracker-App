@@ -1,9 +1,11 @@
-FROM python:3.10
+FROM python:3.9
 
 WORKDIR /app
 
-COPY . /app
+COPY . .
 
-RUN pip install phonenumbers folium opencage
+RUN pip install -r requirements.txt
 
-CMD ["python","tracker.py"]
+EXPOSE 5000
+
+CMD ["python", "app.py"]
