@@ -3,7 +3,7 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout Codes') {
             steps {
                 checkout scmGit(branches: [[name: '*/master']], 
                 extensions: [], 
