@@ -1,47 +1,24 @@
-import json 
-import pycountry
-from tkinter import Tk, Label, Button, Entry
-from phone_iso3166.country import phone_country
+from flask import Flask, render_template, request
+import phonenumbers
+from phonenumbers import geocoder, carrier
+
+app = Flask(__name__)
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    location = ""
+    service = ""
+
+    if request.method == "POST":
+        number = request.form["number"]
+
+        parsed_number = phonenumbers.parse(number)
+
+        location = geocoder.description_for_number(parsed_number, "en")
+        service = carrier.name_for_number(parsed_number, "en")
+
+    return render_template("index.html", location=location, service=service)
 
 
-class Location_Tracker:
-    def __init__(self, App):
-        self.window = App
-        self.window.title("Phone number Tracker")
-        self.window.geometry("500x400")
-        self.window.configure(bg="#3f5efb")
-        self.window.resizable(False, False)
-
-        #___________Application menus_____________
-        Label(App, text="Enter a phone number",fg="white", font=("Times", 20), bg="#3f5efb").place(x=150,y= 30)
-        self.phone_number = Entry(App, width=16, font=("Arial", 15), relief="flat")
-        self.track_button = Button(App, text="Track Country", bg="#22c1c3", relief="sunken")
-        self.country_label = Label(App,fg="white", font=("Times", 20), bg="#3f5efb")
-
-        #___________Place widgets on the window______
-        self.phone_number.place(x=170, y=120)
-        self.track_button.place(x=200, y=200)
-        self.country_label.place(x=100, y=280)
-
-        #__________Linking button with countries ________
-        self.track_button.bind("<Button-1>", self.Track_location)
-        #255757294146
-    
-    def Track_location(self,event):
-        phone_number = self.phone_number.get()
-        country = "Country is Unknown"
-        if phone_number:
-            tracked = pycountry.countries.get(alpha_2=phone_country(phone_number))
-            print(tracked)
-            if tracked:
-                    if hasattr(tracked, "official_name"):
-                        country = tracked.official_name
-                    else:
-                        country = tracked.name
-        self.country_label.configure(text=country)
-
-
-
-PhoneTracker = Tk()
-MyApp = Location_Tracker(PhoneTracker)
-PhoneTracker.mainloop()
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
