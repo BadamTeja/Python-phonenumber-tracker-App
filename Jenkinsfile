@@ -13,7 +13,7 @@ pipeline {
 
         stage('Run Application Test') {
             steps {
-                sh 'python3 app.py || true'
+                sh 'python3 app.py'
             }
         }
 
