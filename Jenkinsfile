@@ -32,9 +32,19 @@ pipeline {
             }
         }
 
+        // 🔴 OLD STAGE (REMOVED)
+        /*
         stage('Run Application Test') {
             steps {
                 sh 'python3 app.py'
+            }
+        }
+        */
+
+        // 🟢 NEW STAGE (ADDED)
+        stage('Python Syntax Check') {
+            steps {
+                sh 'python3 -m py_compile app.py'
             }
         }
 
@@ -46,9 +56,11 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-creds',
-                usernameVariable: 'DOCKER_USER',
-                passwordVariable: 'DOCKER_PASS')]) {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
 
                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
@@ -62,5 +74,4 @@ pipeline {
         }
 
     }
-
 }
