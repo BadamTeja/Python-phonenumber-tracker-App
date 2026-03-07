@@ -1,13 +1,34 @@
 pipeline {
+
     agent any
+
+    environment {
+        DOCKER_IMAGE = "badamteja/phonenumber-tracker"
+    }
 
     stages {
 
-        stage('Checkout Codes') {
+        stage('Checkout Code') {
             steps {
-                checkout scmGit(branches: [[name: '*/master']], 
-                extensions: [], 
-                userRemoteConfigs: [[credentialsId: 'Git-Creds', url: 'https://github.com/BadamTeja/Python-phonenumber-tracker-App.git']])
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/master']],
+                    userRemoteConfigs: [[
+                        credentialsId: 'Git-Creds',
+                        url: 'https://github.com/BadamTeja/Python-phonenumber-tracker-App.git'
+                    ]]
+                ])
+            }
+        }
+
+        stage('Check Files') {
+            steps {
+                sh 'ls -la'
+            }
+        }
+
+        stage('Install Python Dependencies') {
+            steps {
+                sh 'pip3 install -r requirements.txt'
             }
         }
 
@@ -19,23 +40,27 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t badamteja/python-tracker-app:latest .'
+                sh 'docker build -t $DOCKER_IMAGE:latest .'
             }
         }
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh 'echo $PASS | docker login -u $USER --password-stdin'
+                withCredentials([usernamePassword(credentialsId: 'docker-creds',
+                usernameVariable: 'DOCKER_USER',
+                passwordVariable: 'DOCKER_PASS')]) {
+
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                sh 'docker push badamteja/python-tracker-app:latest'
+                sh 'docker push $DOCKER_IMAGE:latest'
             }
         }
 
     }
+
 }
